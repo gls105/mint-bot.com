@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin Abondano — vibe coder</title>
+<meta name="description" content="Martin Abondano (mvrtn) — vibe coder in Miami. I make random stuff and take website design commissions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0a;
+    --text: #e6ebe6;
+    --dim: #6b756b;
+    --green: #4be37a;
+    --mint: #4dd6c1;
+    --line: #1e231e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Ubuntu", sans-serif;
+    line-height: 1.65;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--green); color: #000; }
+
+  .wrap { max-width: 760px; margin: 0; padding: 64px 24px 80px 40px; }
+
+  /* ── Duck ── */
+  .duck {
+    font-family: "Ubuntu Mono", monospace;
+    font-size: clamp(16px, 3.4vw, 26px);
+    line-height: 1.15;
+    white-space: pre;
+    color: var(--green);
+    text-shadow: 0 0 24px rgba(75, 227, 122, .4);
+    margin-bottom: 8px;
+  }
+  .quack {
+    font-family: "Ubuntu Mono", monospace;
+    color: var(--dim);
+    margin-bottom: 48px;
+  }
+  .quack b { color: var(--mint); font-weight: 400; }
+
+  /* ── Intro ── */
+  h1 { font-size: 30px; font-weight: 700; letter-spacing: -.01em; }
+  .sub { color: var(--dim); margin: 4px 0 28px; }
+  .sub .g { color: var(--green); }
+
+  .commission {
+    display: flex; align-items: center; gap: 12px;
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 56px;
+    background: rgba(75, 227, 122, .05);
+  }
+  .commission svg { color: var(--green); flex: none; }
+  .commission a { color: var(--mint); text-decoration: none; }
+  .commission a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  /* ── Tree ── */
+  .tree {
+    font-family: "Ubuntu Mono", monospace;
+    font-size: 15px;
+  }
+  .tree .root { color: var(--green); font-weight: 700; }
+  .branch { display: flex; align-items: baseline; }
+  .branch .pipe { color: var(--dim); white-space: pre; flex: none; }
+  .branch .content { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+  .branch svg { width: 16px; height: 16px; flex: none; color: var(--dim); transform: translateY(2px); }
+  .branch a { color: var(--text); text-decoration: none; font-weight: 700; }
+  .branch a:hover { color: var(--green); }
+  .branch a:hover ~ .desc { color: var(--text); }
+  .branch .desc { color: var(--dim); font-family: "Ubuntu", sans-serif; font-size: 14px; }
+  .branch .live {
+    font-size: 11px; color: var(--mint);
+    border: 1px solid var(--mint); border-radius: 999px;
+    padding: 0 8px; line-height: 1.6;
+  }
+  .branch.label .content { color: var(--green); font-weight: 700; }
+  .branch.label svg { color: var(--green); }
+  .gap { height: 22px; }
+
+  .tree .plain { color: var(--text); font-family: "Ubuntu", sans-serif; font-size: 14.5px; max-width: 56ch; }
+  .tree .plain .g { color: var(--green); }
+  .tree .plain .m { color: var(--mint); }
+  .tree a.inline { color: var(--mint); text-decoration: none; font-weight: 400; }
+  .tree a.inline:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  footer {
+    margin-top: 72px; padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--dim); font-size: 13px;
+    font-family: "Ubuntu Mono", monospace;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  footer .g { color: var(--green); }
+
+  /* ── Walking duck ── */
+  #duckwalk {
+    position: fixed;
+    right: 24px; top: 0; bottom: 0;
+    width: 420px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  #walker {
+    position: absolute;
+    left: 0;
+    z-index: 2;
+    font-family: "Ubuntu Mono", monospace;
+    font-size: 13px;
+    line-height: 1.1;
+    white-space: pre;
+    text-shadow: 0 0 26px rgba(227, 197, 75, .35);
+    transition: top .3s linear, transform .3s ease;
+  }
+  .duck-body { color: #f0d24e; }
+  .duck-bill { color: #e8923a; }
+  .footprint {
+    position: absolute;
+    z-index: 1;
+    color: #e8923a;
+    font-size: 26px;
+    font-weight: 700;
+    opacity: .95;
+    text-shadow: 0 0 10px rgba(232, 146, 58, .5);
+    transition: opacity 14s linear;
+  }
+  #hud {
+    position: fixed;
+    right: 24px; bottom: 24px;
+    z-index: 20;
+    display: flex; gap: 8px; align-items: center;
+  }
+  #hud button {
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--dim);
+    font-family: "Ubuntu Mono", monospace;
+    font-size: 12px;
+    padding: 4px 12px;
+    cursor: pointer;
+  }
+  #hud button:hover { color: var(--green); border-color: var(--green); }
+  #score { font-family: "Ubuntu Mono", monospace; font-size: 12px; color: var(--mint); margin-right: 4px; }
+  #aim {
+    position: absolute;
+    z-index: 4;
+    font-size: 30px;
+    color: var(--amber);
+    text-shadow: 0 0 12px rgba(227, 197, 75, .6);
+  }
+  .bread {
+    position: absolute;
+    z-index: 3;
+    font-size: 22px;
+    transition: opacity 1.2s;
+  }
+  .splash {
+    position: absolute;
+    z-index: 5;
+    font-family: "Ubuntu Mono", monospace;
+    font-size: 14px;
+    transition: opacity 1.2s, transform 1.2s;
+  }
+  @media (max-width: 1280px) { #duckwalk, #hud { display: none; } }
+
+  @media (max-width: 560px) {
+    .branch .desc { display: none; }
+    .wrap { padding-top: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ── Intro ── -->
+<h1>Martin Abondano</h1>
+<p class="sub"><span class="g">vibe coder</span> — Miami, FL. I make random stuff.</p>
+
+<!-- ── Big duck ── -->
+<pre class="duck" aria-label="ASCII art duck">⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣿⣿⣿⣿⣦⡀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⡟⠉⣿⣷⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣦⠄⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⣿⣿⣿⣿⣿⣿⠟⠋⠉⠉⠉⠁⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⢿⣿⡿⠿⠟⢀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⣤⣤⣤⣶⣾⣿⣷⣄⠀⠀⠀⠀⠀
+⠀⠀⣷⣦⣤⣤⣤⣤⣤⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⠛⣿⣿⣿⣿⣇⠀⠀⠀⠀
+⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⢠⣿⣿⣿⣿⡿⠀⠀⠀⠀
+⠀⠀⠈⢿⣿⣿⣯⡙⠛⠿⠿⠿⣿⠿⠿⠿⠛⠋⣁⣴⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀
+⠀⠀⠀⠈⠛⠿⣿⣿⣷⣶⣶⣤⣤⣤⣴⣶⣾⣿⣿⣿⣿⣿⣿⣿⠟⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠉⠙⠛⠿⠿⢿⣿⣿⣿⣿⡿⠿⠿⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠀⣤⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣼⣶⣿⣷⣶⣤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀</pre>
+<p class="quack">$ <b>qwack.</b></p>
+
+<!-- ── Commissions ── -->
+<div class="commission">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+  <span>I take <b>website design commissions</b> — got a site you need built? <a href="mailto:hello@mint-bot.com">hello@mint-bot.com</a></span>
+</div>
+
+<!-- ── Tree ── -->
+<div class="tree">
+  <div class="branch"><span class="root">martin/</span></div>
+
+  <div class="branch label">
+    <span class="pipe">├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+      work/
+    </span>
+  </div>
+
+  <div class="branch">
+    <span class="pipe">│   ├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+      <a href="https://citywise-io.pages.dev" target="_blank" rel="noopener">citywise.io</a>
+      <span class="live">live</span>
+      <span class="desc">— travel guide, 15 cities, AI local advice</span>
+    </span>
+  </div>
+
+  <div class="branch">
+    <span class="pipe">│   ├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"/></svg>
+      <a href="https://github.com/gls105/Learn.edu" target="_blank" rel="noopener">Learn.edu</a>
+      <span class="desc">— free gamified learning PWA, grades 4–9</span>
+    </span>
+  </div>
+
+  <div class="branch">
+    <span class="pipe">│   ├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/></svg>
+      <a href="https://github.com/gls105/particle-text" target="_blank" rel="noopener">particle-text</a>
+      <span class="desc">— canvas particle animation, one file, zero deps</span>
+    </span>
+  </div>
+
+  <div class="branch">
+    <span class="pipe">│   ├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/></svg>
+      <a href="https://github.com/gls105" target="_blank" rel="noopener">TicketRush</a>
+      <span class="desc">— browser reflex game, beat the ticket queue</span>
+    </span>
+  </div>
+
+  <div class="branch">
+    <span class="pipe">│   ├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+      <a href="https://github.com/gls105/StreetCarDrivr" target="_blank" rel="noopener">StreetCarDrivr</a>
+      <span class="desc">— "drive, while you can"</span>
+    </span>
+  </div>
+
+  <div class="branch">
+    <span class="pipe">│   ╰── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+      <a href="https://github.com/gls105/RealLearnOS" target="_blank" rel="noopener">LearnOS</a>
+      <span class="desc">— lightweight browser teaching toolkit</span>
+    </span>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="branch label">
+    <span class="pipe">├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/></svg>
+      what-is-coming-up/
+    </span>
+  </div>
+  <div class="branch">
+    <span class="pipe">│   ├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z"/></svg>
+      <span class="content" style="color:var(--text);font-weight:700">TextMorph v2</span>
+      <span class="desc">— particle-text, evolved. in progress</span>
+    </span>
+  </div>
+  <div class="branch">
+    <span class="pipe">│   ╰── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"/></svg>
+      <span class="content" style="color:var(--text);font-weight:700">BookCityWise</span>
+      <span class="desc">— book hotels right inside citywise.io. coming soon</span>
+    </span>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="branch label">
+    <span class="pipe">├── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+      about
+    </span>
+  </div>
+  <div class="branch">
+    <span class="pipe">│   ╰── </span>
+    <span class="content"><span class="plain">Ideas are cheap, shipping is everything. I open a file, write some
+    <span class="g">vanilla HTML/CSS/JS</span> — <span class="m">no frameworks, no build step</span> —
+    and put it on the internet, usually the same day.</span></span>
+  </div>
+
+  <div class="gap"></div>
+
+  <div class="branch label">
+    <span class="pipe">╰── </span>
+    <span class="content">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+      contact
+    </span>
+  </div>
+  <div class="branch">
+    <span class="pipe">    ├── </span>
+    <span class="content"><span class="plain">email: <a class="inline" href="mailto:hello@mint-bot.com">hello@mint-bot.com</a></span></span>
+  </div>
+  <div class="branch">
+    <span class="pipe">    ╰── </span>
+    <span class="content"><span class="plain">github: <a class="inline" href="https://github.com/gls105" target="_blank" rel="noopener">github.com/gls105</a></span></span>
+  </div>
+</div>
+
+<footer>
+  <span><span class="g">©</span> 2026 Martin Abondano</span>
+  <span>with <span class="g">love</span> from colombia 🇨🇴</span>
+</footer>
+
+</div>
+
+<!-- ── Walking duck ── -->
+<div id="duckwalk" aria-hidden="true">
+  <pre id="walker"></pre>
+</div>
+<div id="hud">
+  <span id="score">fed: 0</span>
+  <button id="breadBtn">🍞 throw bread</button>
+  <button id="pauseBtn">⏸ pause</button>
+</div>
+
+<script>
+  const walker = document.getElementById("walker");
+  const field = document.getElementById("duckwalk");
+  const btn = document.getElementById("pauseBtn");
+
+  // my own braille duck — seen from above, bill pointing down, 40 characters tail-to-bill.
+  // Drawn as math (all ellipses — duck bills are rounded, not pointy) on a braille dot
+  // grid: each char is 2×4 dots. Yellow body, orange bill, like an actual duck.
+  const CH_W = 26, CH_H = 40;
+  const DW = CH_W * 2, DH = CH_H * 4;
+  const BILL_ROW = 35;   // char rows from here down get bill color
+  const inEllipse = (x, y, cx, cy, rx, ry) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 <= 1;
+  function inDuck(x, y) {
+    if (Math.abs(x - DW / 2) < 0.7 && y > 26 && y < 105) return false;   // wing fold line down his back
+    return inEllipse(x, y, 26, 18, 9, 14)        // tail
+        || inEllipse(x, y, 26, 65, 25, 48)       // body + folded wings
+        || inEllipse(x, y, 26, 115, 9, 14)       // neck
+        || inEllipse(x, y, 26, 130, 13, 12)      // head
+        || inEllipse(x, y, 26, 148, 7, 8);       // rounded bill
+  }
+  const BITS = [[0x01, 0x08], [0x02, 0x10], [0x04, 0x20], [0x40, 0x80]];
+  const rows = [];
+  for (let cy = 0; cy < CH_H; cy++) {
+    let row = "";
+    for (let cx = 0; cx < CH_W; cx++) {
+      let code = 0;
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 2; c++)
+        if (inDuck(cx * 2 + c, cy * 4 + r)) code |= BITS[r][c];
+      row += String.fromCharCode(0x2800 + code);
+    }
+    rows.push(row);
+  }
+  walker.innerHTML =
+    '<span class="duck-body">' + rows.slice(0, BILL_ROW).join("\n") + "</span>\n" +
+    '<span class="duck-bill">' + rows.slice(BILL_ROW).join("\n") + "</span>";
+
+  const STEP = 36;          // px per step, downward
+  const TICK = 320;         // ms per step
+  let y, side = 0, paused = false;
+
+  function curveX(yy) {
+    // wavy path — never a straight line
+    return 80 + Math.sin(yy * 0.012) * 70 + Math.sin(yy * 0.004) * 40;
+  }
+
+  function reset() {
+    field.querySelectorAll(".footprint").forEach(f => f.remove());
+    y = -walker.offsetHeight - 20;
+  }
+
+  function step() {
+    if (paused) return;
+    const duckH = walker.offsetHeight;
+    const x = curveX(y);
+
+    // footprint under his body, alternating feet — he walks over them, they emerge behind
+    if (y > 10) {
+      const fp = document.createElement("span");
+      fp.className = "footprint";
+      fp.textContent = "⋎";
+      fp.style.left = (x + (side ? 125 : 55)) + "px";
+      fp.style.top = (y + duckH * 0.4) + "px";
+      field.appendChild(fp);
+      requestAnimationFrame(() => fp.style.opacity = ".45");
+    }
+
+    side = side ? 0 : 1;
+    y += STEP;
+    walker.style.top = y + "px";
+    walker.style.transform = `translateX(${x + (side ? 8 : -8)}px) rotate(${side ? 3 : -3}deg)`;
+
+    // walked off the bottom → back to the top
+    if (y > innerHeight + 40) reset();
+  }
+
+  reset();
+  setInterval(step, TICK);
+
+  btn.addEventListener("click", () => {
+    paused = !paused;
+    btn.textContent = paused ? "▶ play" : "⏸ pause";
+  });
+
+  /* ── bread mini-game: click to start the aim sweeping, click again to throw ── */
+  const breadBtn = document.getElementById("breadBtn");
+  const scoreEl = document.getElementById("score");
+  const aim = document.createElement("div");
+  aim.id = "aim";
+  aim.textContent = "⌖";
+  aim.style.display = "none";
+  field.appendChild(aim);
+
+  let aiming = false, flying = false, aimX = 200, fed = 0;
+
+  function aimLoop(now) {
+    if (!aiming) return;
+    aimX = 190 + Math.sin(now * 0.004) * 170;   // sweeps left↔right — time your release
+    aim.style.left = aimX + "px";
+    requestAnimationFrame(aimLoop);
+  }
+
+  breadBtn.addEventListener("click", () => {
+    if (flying) return;
+    if (!aiming) {
+      aiming = true;
+      aim.style.display = "block";
+      aim.style.top = (innerHeight - 110) + "px";
+      breadBtn.textContent = "🎯 release!";
+      requestAnimationFrame(aimLoop);
+    } else {
+      aiming = false;
+      aim.style.display = "none";
+      breadBtn.textContent = "🍞 throw bread";
+      throwBread(aimX);
+    }
+  });
+
+  function throwBread(tx) {
+    flying = true;
+    const bread = document.createElement("span");
+    bread.className = "bread";
+    bread.textContent = "🍞";
+    field.appendChild(bread);
+    const sx = 360, sy = innerHeight - 60;
+    const ty = y + walker.offsetHeight * 0.85 + STEP;  // aim at his head, lead the walk a bit
+    const t0 = performance.now(), DUR = 550;
+    function fly(now) {
+      const p = Math.min(1, (now - t0) / DUR);
+      bread.style.left = (sx + (tx - sx) * p) + "px";
+      bread.style.top = (sy + (ty - sy) * p - Math.sin(p * Math.PI) * 130) + "px";  // arc
+      bread.style.transform = `rotate(${p * 720}deg)`;
+      if (p < 1) requestAnimationFrame(fly);
+      else land(bread, tx, ty);
+    }
+    requestAnimationFrame(fly);
+  }
+
+  function land(bread, bx, by) {
+    flying = false;
+    const duckCx = curveX(y) + 100;                      // his center, right now
+    const duckHeadY = y + walker.offsetHeight * 0.85;
+    const hit = Math.abs(bx - duckCx) < 80 && Math.abs(by - duckHeadY) < 150;
+    const note = document.createElement("span");
+    note.className = "splash";
+    note.textContent = hit ? "qwack! +1" : "plop.";
+    note.style.color = hit ? "var(--green)" : "var(--dim)";
+    note.style.left = bx + "px";
+    note.style.top = (by - 22) + "px";
+    field.appendChild(note);
+    requestAnimationFrame(() => {
+      note.style.opacity = "0";
+      note.style.transform = "translateY(-16px)";
+    });
+    if (hit) {
+      fed++;
+      scoreEl.textContent = "fed: " + fed;
+      bread.remove();
+    } else {
+      bread.style.opacity = "0";
+      setTimeout(() => bread.remove(), 1200);
+    }
+    setTimeout(() => note.remove(), 1400);
+  }
+</script>
+</body>
+</html>
